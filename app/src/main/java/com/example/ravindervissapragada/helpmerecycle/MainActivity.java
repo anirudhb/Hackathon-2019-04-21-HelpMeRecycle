@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         if(value != "other")
         {
             Intent map = new Intent(this,MapsActivity.class);
+            map.putExtra("type",garbage.getSelectedItem().toString());
             startActivity(map);
         }
     }

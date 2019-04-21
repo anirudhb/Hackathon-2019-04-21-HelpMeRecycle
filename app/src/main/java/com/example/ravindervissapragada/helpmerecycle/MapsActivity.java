@@ -78,8 +78,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onStatusChanged(String s, int i, Bundle b) {}
         };
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 1, ll, Looper.myLooper());
-        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 1, ll, Looper.myLooper());
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10, 1, ll, Looper.myLooper());
+        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10, 1, ll, Looper.myLooper());
     }
 
     /**
