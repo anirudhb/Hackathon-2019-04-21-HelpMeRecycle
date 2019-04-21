@@ -13,6 +13,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.Looper;
 import android.os.ResultReceiver;
 import android.support.v4.app.ActivityCompat;
@@ -134,6 +135,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startService(intent);
     }
     private class LatLngReceiver extends ResultReceiver {
+        public LatLngReceiver(Handler h) {
+            super(h);
+        }
         @Override
         public void send(int resultCode, Bundle data) {
             if (resultCode == 0) {

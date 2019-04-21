@@ -21,11 +21,19 @@ class AddMarkersService extends IntentService {
 
     protected ResultReceiver receiver;
 
+    public AddMarkersService(String s) {
+        super(s);
+    }
+
+    public AddMarkersService() {
+        super("");
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         String item = intent.getStringExtra("type");
-        double lat = intent.getDoubleExtra("lat");
-        double lon = intent.getDoubleExtra("lon");
+        double lat = intent.getDoubleExtra("lat", 0);
+        double lon = intent.getDoubleExtra("lon", 0);
         receiver = intent.getParcelableExtra("receiver");
         Location targetLocation = new Location("");//provider name is unnecessary
         targetLocation.setLatitude(lat);//your coords of course
