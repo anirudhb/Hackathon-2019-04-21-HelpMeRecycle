@@ -123,7 +123,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         targetLocation.setLongitude(lon);
 
         try {
-            DataIntercepter.run(item, getZipCodeFromLocation(targetLocation));
+            Geocoder coder = new Geocoder(this);
+            List<String> addresses = DataIntercepter.run(item, getZipCodeFromLocation(targetLocation));
+            List<Address> latlong;
+            for (String address: addresses) {
+                // Reverse geocode, and put on map.
+                latlong = coder.getFromLocationName(address, 5);
+                if (address == null) { continue; }
+                Address l = address.get(0);
+                LatLng pt = new LatLng(l.getLatitude(), l.getLongitude());
+                mMap.addMarker(new MarkerOptions()
+                        .position(latlon)
+                        .title("Another area"));
+            }
         } catch (IOException e) {
             System.out.printf("Error!%s\n", e.getMessage());
         }
