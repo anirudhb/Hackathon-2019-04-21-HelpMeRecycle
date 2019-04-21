@@ -124,7 +124,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         try {
             DataIntercepter.run(item, getZipCodeFromLocation(targetLocation),getBaseContext());
         } catch (IOException e) {
-            System.out.println("Error!", e);
+            System.out.printf("Error!%s\n", e.getMessage());
         }
     }
     private String getZipCodeFromLocation(Location location) {
