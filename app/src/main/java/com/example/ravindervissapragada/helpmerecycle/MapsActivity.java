@@ -51,7 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         Task getLocation = fusedLocationClient.getLastLocation();
-        while (!getLocation.isComplete());
+        while (!getLocation.isComplete()) {};
         if (getLocation.isSuccessful()) {
             Location location = (Location) getLocation.getResult();
             if (location != null) {
