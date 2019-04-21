@@ -5,15 +5,19 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Bundle;
+import android.os.ResultReceiver;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 class AddMarkersService extends IntentService {
-    final String RES_KEY = "res";
+    final static String RES_KEY = "res";
 
     protected ResultReceiver receiver;
 

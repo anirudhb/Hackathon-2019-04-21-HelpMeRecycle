@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.CursorJoiner;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -13,6 +14,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Looper;
+import android.os.ResultReceiver;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -29,10 +31,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, ResultReceiver {
+public class MapsActivity extends FragmentActivity, ResultReceiver implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
@@ -124,7 +127,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         intent.putExtra("type", type);
         intent.putExtra("lat", lat);
         intent.putExtra("lon", lon);
-        intent.putExtra("receiver", this);
+        intent.putExtra("receiver", (ResultReceiver) this);
         startService(intent);
     }
 
@@ -132,7 +135,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void send(int resultCode, Bundle data) {
         if (resultCode == 0) {
             // Receive latitudes and longitudes, and put them on the map.
-            ArrayList<LatLng> places = data.getParcelableExtra(AddMarkersService.RES_KEY);
+            ArrayList<LatLng> places = data.getParcelableArrayList(AddMarkersService.RES_KEY);
             for (LatLng place: places) {
                 mMap.addMarker(new MarkerOptions()
                         .position(place)
