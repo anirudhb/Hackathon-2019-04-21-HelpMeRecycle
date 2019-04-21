@@ -1,5 +1,6 @@
 package com.example.ravindervissapragada.helpmerecycle;
 
+import android.content.Context;
 import android.location.Geocoder;
 import android.os.Bundle;
 
@@ -8,7 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.IOException;
-public class DataIntercepter extends MapsActivity{
+public class DataIntercepter{
     /* not necessary, we will be instantiating this from the activity
     public static void main(String[] args) throws IOException {
         DataIntercepter di = new DataIntercepter();
@@ -16,21 +17,19 @@ public class DataIntercepter extends MapsActivity{
 
     }
     */
-    public void run(String what, int zipcode) {
-        Geocoder geocoder = new Geocoder();
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            String item = extras.getString("type");
-            String zipcode = geocoder.getFromLocation(lat,lon, 1);
-        }
+    public static void run(String what, String zipcode, Context context) {
+        Geocoder geocoder = new Geocoder(context);
+
 
         String url = String.format("http://search.earth911.com/?what=%s&where=%d", what, zipcode);
-        Document doc = Jsoup.connect(url).get();
+        try {
+            Document doc = Jsoup.connect(url).get();
+        } catch (IOException e) {return;}
         System.out.println(doc.title());
 
         Elements newsHeadlines = doc.select("#mp-itn b a");
         for (Element headline : newsHeadlines) {
-            System.out.println("%s\n\t%s", headline.attr("title"), headline.absUrl("href"));
+                System.out.printf("%s\n\t%s\n", headline.attr("title"), headline.absUrl("href"));
         }
     }
 }

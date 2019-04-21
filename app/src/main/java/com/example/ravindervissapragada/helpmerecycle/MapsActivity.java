@@ -3,7 +3,9 @@ package com.example.ravindervissapragada.helpmerecycle;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -22,6 +24,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -74,7 +80,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         hasLatLon = true;
                         putMarker();
                     }
-                });
+                }});
     }
 
     /**
@@ -96,7 +102,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     protected void enableMyLocation() {
         if (mapReady) {
-            googleMap.setMyLocationEnabled(true);
+            mMap.setMyLocationEnabled(true);
         }
     }
 
@@ -107,5 +113,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions()
                 .position(latlon)
                 .title("You Are Here"));
+        Bundle extras = getIntent().getExtras();
+        String item = "";
+        if (extras != null) {
+            item = extras.getString("type");
+        }
+        Location targetLocation = new Location("");//provider name is unnecessary
+        targetLocation.setLatitude(lat);//your coords of course
+        targetLocation.setLongitude(lon);
+        DataIntercepter.run(item, getZipCodeFromLocation(targetLocation),getBaseContext());
+
+    }
+    private String getZipCodeFromLocation(Location location) {
+        Address addr = getAddressFromLocation(location);
+        return addr.getPostalCode() == null ? "" : addr.getPostalCode();
+    }
+    private Address getAddressFromLocation(Location location) {
+        Geocoder geocoder = new Geocoder(this);
+        Address address = new Address(Locale.getDefault());
+        try {
+            List<Address> addr = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            if (addr.size() > 0) {
+                address = addr.get(0);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return address;
     }
 }
