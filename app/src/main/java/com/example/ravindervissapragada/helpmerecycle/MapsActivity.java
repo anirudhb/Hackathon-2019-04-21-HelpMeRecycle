@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, ResultReceiver {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
@@ -122,8 +122,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String type = getIntent().getStringExtra("type");
         Intent intent = new Intent(this, AddMarkersService.class);
         intent.putExtra("type", type);
+        intent.putExtra("lat", lat);
+        intent.putExtra("lon", lon);
+        intent.putExtra("receiver", this);
         startService(intent);
     }
+
+    @Override
+    public void send(int resultCode, Bundle data) {
+        if (resultCode == 0) {
+            // Receive latitudes and longitudes, and put them on the map.
+            ArrayList<LatLng> places = data.getParcelableExtra(AddMarkersService.RES_KEY);
+            for (LatLng place: places) {
+                mMap.addMarker(new MarkerOptions()
+                        .position(place)
+                        .title("A place"));
+                System.out.println("Added marker");
+            }
+        }
+    }
+
     private String getZipCodeFromLocation(Geocoder geocoder, Location location) {
         Address addr = getAddressFromLocation(geocoder, location);
         return addr.getPostalCode() == null ? "" : addr.getPostalCode();

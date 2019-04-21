@@ -13,11 +13,16 @@ import java.util.List;
 import java.util.Locale;
 
 class AddMarkersService extends IntentService {
+    final String RES_KEY = "res";
+
+    protected ResultReceiver receiver;
+
     @Override
     protected void onHandleIntent(Intent intent) {
         String item = intent.getStringExtra("type");
         double lat = intent.getDoubleExtra("lat");
         double lon = intent.getDoubleExtra("lon");
+        receiver = intent.getParcelableExtra("receiver");
         Location targetLocation = new Location("");//provider name is unnecessary
         targetLocation.setLatitude(lat);//your coords of course
         targetLocation.setLongitude(lon);
@@ -27,19 +32,42 @@ class AddMarkersService extends IntentService {
             List<String> addresses = DataIntercepter.run(item, getZipCodeFromLocation(coder, targetLocation));
             System.out.println("Ran intercepter");
             List<Address> latlong;
+            ArrayList<LatLng> pts = new ArrayList<LatLng>();
             for (String address: addresses) {
                 // Reverse geocode, and put on map.
                 latlong = coder.getFromLocationName(address, 5);
                 if (latlong == null) { continue; }
                 Address l = latlong.get(0);
                 LatLng pt = new LatLng(l.getLatitude(), l.getLongitude());
-                mMap.addMarker(new MarkerOptions()
-                        .position(pt)
-                        .title("Another area"));
-                System.out.println("Plotted point");
+                pts.add(pt);
             }
+            deliverResultToReceiver(0, pts);
         } catch (IOException e) {
             System.out.printf("Error: %s\n", e.getLocalizedMessage());
+            deliverResultToReceiver(1, null);
         }
+    }
+
+    private void deliverResultToReceiver(int resultCode, ArrayList<LatLng> message) {
+        Bundle b = new Bundle();
+        b.putParcelableArrayList(RES_KEY, message);
+        receiver.send(resultCode, b);
+    }
+
+    private String getZipCodeFromLocation(Geocoder geocoder, Location location) {
+        Address addr = getAddressFromLocation(geocoder, location);
+        return addr.getPostalCode() == null ? "" : addr.getPostalCode();
+    }
+    private Address getAddressFromLocation(Geocoder geocoder, Location location) {
+        Address address = new Address(Locale.getDefault());
+        try {
+            List<Address> addr = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            if (addr.size() > 0) {
+                address = addr.get(0);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return address;
     }
 }
