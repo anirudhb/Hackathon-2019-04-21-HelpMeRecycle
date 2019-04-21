@@ -60,10 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     protected void addLocationListener() {
-        Criteria c = new Criteria();
-        c.setAccuracy(Criteria.ACCURACY_HIGH);
-        c.setPowerRequirement(Criteria.NO_REQUIREMENT);
-        lm.requestLocationUpdates(0, 1, c, new LocationListener() {
+        LocationListener ll = new LocationListener() {
             @Override
             public void onLocationChanged(Location l) {
                 if (l != null) {
@@ -80,7 +77,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onProviderEnabled(String s) {}
             @Override
             public void onStatusChanged(String s, int i, Bundle b) {}
-        }, Looper.myLooper());
+        };
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 1, ll, Looper.myLooper());
+        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 1, ll, Looper.myLooper());
     }
 
     /**
