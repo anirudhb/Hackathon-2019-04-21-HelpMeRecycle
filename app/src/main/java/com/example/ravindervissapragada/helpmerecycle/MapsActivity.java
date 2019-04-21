@@ -9,9 +9,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationManager;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -23,8 +21,7 @@ import com.google.android.gms.tasks.Task;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private FusedLocationProviderClient fusedLocationClient;
-    private LocationRequest lr;
+    private LocationManager lm;
     private int locationRequestCode = 1000;
     private double lat, lon;
     private boolean hasLatLon = false;
@@ -38,7 +35,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        requestLocation();
+        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         // Ask for permission if not already granted.
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -61,30 +58,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     protected void addLocationListener() {
-        fusedLocationClient.requestLocationUpdates(lr, new LocationCallback() {
+        Criteria c;
+        c.setAccuracy(Criteria.HIGH_ACCURACY);
+        lm.requestLocationUpdates(0, 1, c, new LocationListener() {
             @Override
-            public void onLocationResult(LocationResult locationResult) {
-                super.onLocationRequest(locationResult);
-                System.out.println("Got location(1)");
-                Location location = locationResult.getLastLocation();
-                if (location != null) {
-                    System.out.println("Got location");
-                    lat = location.getLatitude();
-                    lon = location.getLongitude();
+            public void onLocationChanged(Location l) {
+                if (l != null) {
+                    lat = l.getLatitude();
+                    lon = l.getLongitude();
                     hasLatLon = true;
                     putMarker();
                 }
             }
+
+            @Override
+            public void onProviderDisabled(String s) {}
+            @Override
+            public void onProviderEnabled(String s) {}
+            @Override
+            public void onStatusChanged(String s, int i, Bundle b) {}
         }, Looper.myLooper());
     }
-
-    protected void requestLocation() {
-        lr = new LocationRequest()
-            .setInterval(100)
-            .setFastestInterval(100)
-            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
 
     /**
      * Manipulates the map once available.
