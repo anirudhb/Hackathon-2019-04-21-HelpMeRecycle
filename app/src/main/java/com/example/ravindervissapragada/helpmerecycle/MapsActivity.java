@@ -44,7 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, locationRequestCode);
         } else {
-            getCurrentLocation();
+            addLocationListener();
         }
     }
 
@@ -54,33 +54,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         switch (requestCode) {
             case locationRequestCode:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getCurrentLocation();
+                    addLocationListener();
                 }
                 break;
         }
     }
 
-    protected void getCurrentLocation() {
-        fusedLocationClient().getLocation()
-            .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        lat = location.getLatitude();
-                        lon = location.getLongitude();
-                        hasLatLon = true;
-                        putMarker();
-                    } else {
-                        getCurrentLocation();
-                    }
+    protected void addLocationListener() {
+        fusedLocationClient.requestLocationUpdates(lr, new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationRequest(locationResult);
+                System.out.println("Got location(1)");
+                Location location = locationResult.getLastLocation();
+                if (location != null) {
+                    System.out.println("Got location");
+                    lat = location.getLatitude();
+                    lon = location.getLongitude();
+                    hasLatLon = true;
+                    putMarker();
                 }
-            });
+            }
+        }, Looper.myLooper());
     }
 
     protected void requestLocation() {
         lr = new LocationRequest()
-            .setInterval(100);
-            .setFastestInterval(100);
+            .setInterval(100)
+            .setFastestInterval(100)
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
