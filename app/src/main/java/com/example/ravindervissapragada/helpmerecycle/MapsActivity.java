@@ -1,6 +1,7 @@
 package com.example.ravindervissapragada.helpmerecycle;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -9,6 +10,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -106,6 +108,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    protected class DataTask extends AsyncTask<Activity, Void, Void> {
+        @Override
+        protected Void doInBackground(Activity... v) {
+            Bundle extras = getIntent().getExtras();
+            String item = "";
+            if (extras != null) {
+                item = extras.getString("type");
+            }
+            Location targetLocation = new Location("");//provider name is unnecessary
+            targetLocation.setLatitude(lat);//your coords of course
+            targetLocation.setLongitude(lon);
+            Activity a = v[0];
+            try {
+                Geocoder coder = new Geocoder(a);
+                System.out.println("Creataed geocoder");
+                List<String> addresses = DataIntercepter.run(item, getZipCodeFromLocation(targetLocation));
+                System.out.println("Ran intercepter");
+                List<Address> latlong;
+                for (String address: addresses) {
+                    // Reverse geocode, and put on map.
+                    latlong = coder.getFromLocationName(address, 5);
+                    if (latlong == null) { continue; }
+                    Address l = latlong.get(0);
+                    LatLng pt = new LatLng(l.getLatitude(), l.getLongitude());
+                    mMap.addMarker(new MarkerOptions()
+                            .position(pt)
+                            .title("Another area"));
+                    System.out.println("Plotted point");
+                }
+            } catch (IOException e) {
+                System.out.printf("Error: %s\n", e.getLocalizedMessage());
+            }
+            return null;
+        }
+    }
+
     protected void putMarker() {
         if (!mapReady || !hasLatLon) return;
         // Create LatLon Object and put it on the map.
@@ -113,35 +151,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions()
                 .position(latlon)
                 .title("You Are Here"));
-        Bundle extras = getIntent().getExtras();
-        String item = "";
-        if (extras != null) {
-            item = extras.getString("type");
-        }
-        Location targetLocation = new Location("");//provider name is unnecessary
-        targetLocation.setLatitude(lat);//your coords of course
-        targetLocation.setLongitude(lon);
 
-        try {
-            Geocoder coder = new Geocoder(this);
-            System.out.println("Creataed geocoder");
-            List<String> addresses = DataIntercepter.run(item, getZipCodeFromLocation(targetLocation));
-            System.out.println("Ran intercepter");
-            List<Address> latlong;
-            for (String address: addresses) {
-                // Reverse geocode, and put on map.
-                latlong = coder.getFromLocationName(address, 5);
-                if (address == null) { continue; }
-                Address l = address.get(0);
-                LatLng pt = new LatLng(l.getLatitude(), l.getLongitude());
-                mMap.addMarker(new MarkerOptions()
-                        .position(latlon)
-                        .title("Another area"));
-                System.out.println("Plotted point");
-            }
-        } catch (IOException e) {
-            System.out.printf("Error!%s\n", e.getMessage());
-        }
+        System.out.println("Running data task");
+        new DataTask().execute(this);
     }
     private String getZipCodeFromLocation(Location location) {
         Address addr = getAddressFromLocation(location);

@@ -2,6 +2,8 @@ package com.example.ravindervissapragada.helpmerecycle;
 
 import java.util.ArrayList;
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 import android.content.Context;
 import android.location.Geocoder;
@@ -21,7 +23,8 @@ public class DataIntercepter{
     */
     // Returns the addresses nearby.
     public static List<String> run(String what, String zipcode) throws IOException {
-        String url = String.format("http://search.earth911.com/?what=%s&where=%d", what, zipcode);
+        String url = String.format(Locale.ENGLISH, "https://search.earth911.com/?what=%s&where=%s", what, zipcode);
+        System.out.printf("URL: %s\n", url);
         Document doc = Jsoup.connect(url).get();
         System.out.println(doc.title());
 
@@ -34,7 +37,7 @@ public class DataIntercepter{
             for (Element contact: contacts) {
                 addresstxts.add(contact.ownText());
             }
-            String address = String.join(" ", list);
+            String address = String.join(" ", addresstxts);
             addresses.add(address);
         }
         return addresses;
