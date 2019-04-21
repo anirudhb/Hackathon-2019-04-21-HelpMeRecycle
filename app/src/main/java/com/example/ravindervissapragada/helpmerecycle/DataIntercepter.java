@@ -26,16 +26,11 @@ public class DataIntercepter extends MapsActivity{
 
         String url = String.format("http://search.earth911.com/?what=%s&where=%d", what, zipcode);
         Document doc = Jsoup.connect(url).get();
-        log(doc.title());
+        System.out.println(doc.title());
 
         Elements newsHeadlines = doc.select("#mp-itn b a");
         for (Element headline : newsHeadlines) {
-            log("%s\n\t%s", headline.attr("title"), headline.absUrl("href"));
+            System.out.println("%s\n\t%s", headline.attr("title"), headline.absUrl("href"));
         }
     }
-
-    private static void log(String msg, String... vals) {
-        System.out.println(String.format(msg, vals));
-    }
-
 }

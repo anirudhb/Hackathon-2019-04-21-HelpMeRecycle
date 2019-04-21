@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -63,28 +64,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     protected void addLocationListener() {
-        LocationListener ll = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location l) {
-                if (l != null) {
-                    lat = l.getLatitude();
-                    lon = l.getLongitude();
-                    hasLatLon = true;
-                    putMarker();
-                    // Single position.
-                    lm.removeUpdates(this);
-                }
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {}
-            @Override
-            public void onProviderEnabled(String s) {}
-            @Override
-            public void onStatusChanged(String s, int i, Bundle b) {}
-        };
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10, 1, ll, Looper.myLooper());
-        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10, 1, ll, Looper.myLooper());
+        fusedLocationClient.getLastLocation()
+            .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location l) {
+                    if (l != null) {
+                        lat = l.getLatitude();
+                        lon = l.getLongitude();
+                        hasLatLon = true;
+                        putMarker();
+                    }
+                });
     }
 
     /**
