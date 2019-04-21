@@ -44,7 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case locationRequestCode:
@@ -60,8 +60,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
-                    lat = location.getLatitude();
-                    lon = location.getLongitude();
+                    if (location != null) {
+                        lat = location.getLatitude();
+                        lon = location.getLongitude();
+                    } else {
+                        getCurrentLocation();
+                    }
                 }
             });
     }
