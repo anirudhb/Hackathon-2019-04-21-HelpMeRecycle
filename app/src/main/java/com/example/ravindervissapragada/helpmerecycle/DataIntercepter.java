@@ -45,6 +45,7 @@ public class DataIntercepter{
             if((addresses.get(i).isEmpty()))
             {
                 addresses.remove(i);
+                //startActivity(map);
             }
         }
         return addresses;

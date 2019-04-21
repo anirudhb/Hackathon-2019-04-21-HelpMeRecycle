@@ -23,11 +23,15 @@ public class MainActivity extends AppCompatActivity {
     }
     public void change(View next){
         String value = garbage.getSelectedItem().toString();
-        if(value != "other")
+        if(value.equals("other"))
         {
+            Intent cam = new Intent(this,CameraActivity.class);
+            startActivity(cam);
+        }else{
             Intent map = new Intent(this,MapsActivity.class);
             map.putExtra("type",garbage.getSelectedItem().toString());
             startActivity(map);
         }
+
     }
 }
