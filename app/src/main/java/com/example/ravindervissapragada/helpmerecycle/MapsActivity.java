@@ -59,7 +59,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     protected void addLocationListener() {
         Criteria c;
-        c.setAccuracy(Criteria.HIGH_ACCURACY);
+        c.setAccuracy(Criteria.ACCURACY_HIGH);
+        c.setPowerRequirement(Criteria.NO_REQUIREMENT);
         lm.requestLocationUpdates(0, 1, c, new LocationListener() {
             @Override
             public void onLocationChanged(Location l) {
