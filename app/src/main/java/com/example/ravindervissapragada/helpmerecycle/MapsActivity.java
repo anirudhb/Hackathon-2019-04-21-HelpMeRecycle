@@ -9,50 +9,20 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Task;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-
-    private final LocationListener mLocationListener = new LocationListener() {
-        @Override
-        public void onProviderEnabled(String s) {}
-        @Override
-        public void onStatusChanged(String s, int i, Bundle b) {}
-        @Override
-        public void onLocationChanged(final Location location) {
-            double lat = location.getLatitude();
-            double lon = location.getLongitude();/*
-            LatLng myLoc = new LatLng(lat, lon);
-            setMyLocation(myLoc);/*
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            mMap.setMyLocationEnabled(true);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLoc, 13));
-
-            mMap.addMarker(new MarkerOptions()
-                    .title("You Are Here")
-                    .snippet("")
-                    .position(myLoc));*/
-        }
-        @Override
-        public void onProviderDisabled(String s) {}
-    };
+    private FusedLocationProviderClient fusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,20 +32,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10,
-                1, mLocationListener);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
 
 
@@ -91,7 +49,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-
+        Task getLocation = fusedLocationClient.getLastLocation();
+        while (!getLocation.isComplete());
+        if (getLocation.isSuccessful()) {
+            Location location = (Location) getLocation.getResult();
+            if (location != null) {
+                // Create LatLon Object and put it on the map.
+                double lat = location.getLatitude();
+                double lon = location.getLongitude();
+                LatLon latlon = new LatLon(lat, lon);
+                map.addMarker(new MarkerOptions()
+                        .position(latlon)
+                        .title("You Are Here"));
+            }
+        }
     }
 }
