@@ -123,7 +123,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             try {
                 Geocoder coder = new Geocoder(a);
                 System.out.println("Creataed geocoder");
-                List<String> addresses = DataIntercepter.run(item, getZipCodeFromLocation(targetLocation));
+                List<String> addresses = DataIntercepter.run(item, getZipCodeFromLocation(geocoder, targetLocation));
                 System.out.println("Ran intercepter");
                 List<Address> latlong;
                 for (String address: addresses) {
@@ -155,12 +155,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         System.out.println("Running data task");
         new DataTask().execute(this);
     }
-    private String getZipCodeFromLocation(Location location) {
-        Address addr = getAddressFromLocation(location);
+    private String getZipCodeFromLocation(Geocoder geocoder, Location location) {
+        Address addr = getAddressFromLocation(geocoder, location);
         return addr.getPostalCode() == null ? "" : addr.getPostalCode();
     }
-    private Address getAddressFromLocation(Location location) {
-        Geocoder geocoder = new Geocoder(this);
+    private Address getAddressFromLocation(Geocoder geocoder, Location location) {
         Address address = new Address(Locale.getDefault());
         try {
             List<Address> addr = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
