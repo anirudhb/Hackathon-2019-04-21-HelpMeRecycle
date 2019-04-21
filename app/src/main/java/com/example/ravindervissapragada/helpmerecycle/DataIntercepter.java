@@ -17,14 +17,12 @@ public class DataIntercepter{
 
     }
     */
-    public static void run(String what, String zipcode, Context context) {
+    public static void run(String what, String zipcode, Context context) throws {
         Geocoder geocoder = new Geocoder(context);
 
 
         String url = String.format("http://search.earth911.com/?what=%s&where=%d", what, zipcode);
-        try {
-            Document doc = Jsoup.connect(url).get();
-        } catch (IOException e) {return;}
+        Document doc = Jsoup.connect(url).get();
         System.out.println(doc.title());
 
         Elements newsHeadlines = doc.select("#mp-itn b a");
