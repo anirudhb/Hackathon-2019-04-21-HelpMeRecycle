@@ -121,9 +121,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             targetLocation.setLongitude(lon);
             Activity a = v[0];
             try {
-                Geocoder coder = new Geocoder(a);
+                Geocoder coder = new Geocoder(a, Locale.ENGLISH);
                 System.out.println("Creataed geocoder");
-                List<String> addresses = DataIntercepter.run(item, getZipCodeFromLocation(geocoder, targetLocation));
+                List<String> addresses = DataIntercepter.run(item, getZipCodeFromLocation(coder, targetLocation));
                 System.out.println("Ran intercepter");
                 List<Address> latlong;
                 for (String address: addresses) {
