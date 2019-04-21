@@ -31,12 +31,12 @@ public class DataIntercepter{
         List<String> addresses = new ArrayList<String>();
         Elements locations = doc.select(".location");
         for (Element location: locations) {
-            Elements contacts = location.select(".contact1, .contact2, .contact3");
+            Elements contacts = location.select(".address1, .address2, .address3");
             // Contatenate their contents.
             List<String> addresstxts = new ArrayList<String>();
             for (Element contact: contacts) {
                 addresstxts.add(contact.ownText());
-                System.out.println(contact.ownText());
+                System.out.printf("Contact: %s\n", contact.ownText());
             }
             String address = String.join(" ", addresstxts);
             addresses.add(address);

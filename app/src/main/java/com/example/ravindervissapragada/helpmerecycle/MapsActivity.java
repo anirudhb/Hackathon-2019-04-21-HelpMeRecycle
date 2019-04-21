@@ -2,8 +2,10 @@ package com.example.ravindervissapragada.helpmerecycle;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.CursorJoiner;
 import android.location.Address;
@@ -20,6 +22,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -46,6 +49,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean hasLatLon = false;
     private boolean mapReady = false;
 
+    private class AMSReceiver extends BroadcastReceiver {
+        public void onReceive(Context c, Intent intent) {
+            System.out.println("recieve");
+            if (intent.getAction() == "SUCCESS") {
+                System.out.println("Received data");
+                // Receive latitudes and longitudes, and put them on the map.
+                ArrayList<LatLng> places = intent.getParcelableArrayListExtra(AddMarkersService.RES_KEY);
+                for (LatLng place: places) {
+                    mMap.addMarker(new MarkerOptions()
+                            .position(place)
+                            .title("A place"));
+                    System.out.println("Added marker");
+                }
+            }
+        }
+    }
+
+    private AMSReceiver receiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +84,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             addLocationListener();
             enableMyLocation();
         }
+        receiver = new AMSReceiver();
+        IntentFilter ifil = new IntentFilter();
+        ifil.addAction("SUCCESS");
+        registerReceiver(receiver, ifil);
     }
 
     @Override
@@ -114,7 +140,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private LatLngReceiver receiver;
 
     protected void putMarker() {
         if (!mapReady || !hasLatLon) return;
@@ -123,36 +148,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions()
                 .position(latlon)
                 .title("You Are Here"));
+        CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(latlon, 10);
+        mMap.animateCamera(cu);
 
         System.out.println("Running intent service");
         // Get type from our intent and pass it on
-        receiver = new LatLngReceiver(new Handler());
         String type = getIntent().getStringExtra("type");
         Intent intent = new Intent(this, AddMarkersService.class);
         intent.putExtra("type", type);
         intent.putExtra("lat", lat);
         intent.putExtra("lon", lon);
-        intent.putExtra("receiver", receiver);
         startService(intent);
-    }
-    private class LatLngReceiver extends ResultReceiver {
-        public LatLngReceiver(Handler h) {
-            super(h);
-        }
-        @Override
-        public void send(int resultCode, Bundle data) {
-            if (resultCode == 0) {
-                System.out.println("Received data");
-                // Receive latitudes and longitudes, and put them on the map.
-                ArrayList<LatLng> places = data.getParcelableArrayList(AddMarkersService.RES_KEY);
-                for (LatLng place: places) {
-                    mMap.addMarker(new MarkerOptions()
-                            .position(place)
-                            .title("A place"));
-                    System.out.println("Added marker");
-                }
-            }
-        }
     }
 
     private String getZipCodeFromLocation(Geocoder geocoder, Location location) {

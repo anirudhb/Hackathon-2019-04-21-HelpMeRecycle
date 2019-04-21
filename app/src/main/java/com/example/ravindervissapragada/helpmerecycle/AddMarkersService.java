@@ -22,8 +22,6 @@ import java.util.Locale;
 class AddMarkersService extends IntentService {
     final static String RES_KEY = "res";
 
-    protected ResultReceiver receiver;
-
     public AddMarkersService(String s) {
         super(s);
     }
@@ -37,7 +35,6 @@ class AddMarkersService extends IntentService {
         String item = intent.getStringExtra("type");
         double lat = intent.getDoubleExtra("lat", 0);
         double lon = intent.getDoubleExtra("lon", 0);
-        receiver = intent.getParcelableExtra("receiver");
         GeoApiContext ctxt = new GeoApiContext.Builder()
                 .apiKey(getString(R.string.key))
                 .build();
@@ -56,23 +53,28 @@ class AddMarkersService extends IntentService {
                 if (address.isEmpty()) continue;
                 if (address.trim().isEmpty()) continue;
                 System.out.println("Running request");
-                GeocodingResult[] latlong = GeocodingApi.newRequest(ctxt).address(address).await();
-                if (latlong == null || latlong.length == 0) { continue; }
-                com.google.maps.model.LatLng _loc = latlong[0].geometry.location;
-                LatLng pt = new LatLng(_loc.lat, _loc.lng);
+                //GeocodingResult[] latlong = GeocodingApi.newRequest(ctxt).address(address).await();
+                //if (latlong == null || latlong.length == 0) { continue; }
+                //com.google.maps.model.LatLng _loc = latlong[0].geometry.location;
+                List<Address> loc = coder.getFromLocationName(address, 5);
+                if (loc == null) continue;
+                Address a = loc.get(0);
+                LatLng pt = new LatLng(a.getLatitude(), a.getLongitude());
                 pts.add(pt);
             }
+            System.out.println("Success");
             deliverResultToReceiver(0, pts);
         } catch (Exception e) {
             System.out.printf("Error: %s\n", e.getLocalizedMessage());
-            deliverResultToReceiver(1, null);
         }
     }
 
     private void deliverResultToReceiver(int resultCode, ArrayList<LatLng> message) {
-        Bundle b = new Bundle();
-        b.putParcelableArrayList(RES_KEY, message);
-        receiver.send(resultCode, b);
+        Intent intent = new Intent();
+        intent.setAction("SUCCESS");
+        intent.putExtra(RES_KEY, message);
+        System.out.println("sending broadcast");
+        sendBroadcast(intent);
     }
 
     private String getZipCodeFromLocation(Geocoder geocoder, Location location) {
