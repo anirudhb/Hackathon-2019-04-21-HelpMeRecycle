@@ -141,6 +141,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public void send(int resultCode, Bundle data) {
             if (resultCode == 0) {
+                System.out.println("Received data");
                 // Receive latitudes and longitudes, and put them on the map.
                 ArrayList<LatLng> places = data.getParcelableArrayList(AddMarkersService.RES_KEY);
                 for (LatLng place: places) {
