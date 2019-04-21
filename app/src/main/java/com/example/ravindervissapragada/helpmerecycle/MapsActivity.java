@@ -32,9 +32,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        // Ask for location.
+        requestLocation();
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+    }
+
+    protected void requestLocation() {
+        LocationRequest lr = LocationRequest.create();
+        lr.setInterval(10000);
+        lr.setFastestInterval(10000);
+        lr.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
 
@@ -51,10 +59,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         Task getLocation = fusedLocationClient.getLastLocation();
-        while (!getLocation.isComplete()) {};
+        while (!getLocation.isComplete()) {
+            System.out.println("Getting location still...");
+        }
         if (getLocation.isSuccessful()) {
+            System.out.println("Got location!");
             Location location = (Location) getLocation.getResult();
             if (location != null) {
+                System.out.println("Not null location!");
                 // Create LatLon Object and put it on the map.
                 double lat = location.getLatitude();
                 double lon = location.getLongitude();
