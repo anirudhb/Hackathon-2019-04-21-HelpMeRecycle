@@ -24,6 +24,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
+    private LocationRequest lr;
     private int locationRequestCode = 1000;
     private double lat, lon;
     private boolean hasLatLon = false;
@@ -77,10 +78,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     protected void requestLocation() {
-        LocationRequest lr = LocationRequest.create();
-        lr.setInterval(10000);
-        lr.setFastestInterval(10000);
-        lr.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        lr = new LocationRequest()
+            .setInterval(100);
+            .setFastestInterval(100);
+            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
 
