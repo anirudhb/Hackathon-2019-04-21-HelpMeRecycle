@@ -58,8 +58,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Create LatLon Object and put it on the map.
                 double lat = location.getLatitude();
                 double lon = location.getLongitude();
-                LatLon latlon = new LatLon(lat, lon);
-                map.addMarker(new MarkerOptions()
+                LatLng latlon = new LatLng(lat, lon);
+                mMap.addMarker(new MarkerOptions()
                         .position(latlon)
                         .title("You Are Here"));
             }
