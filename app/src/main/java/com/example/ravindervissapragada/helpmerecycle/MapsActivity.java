@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -36,6 +37,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        requestLocation();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         // Ask for permission if not already granted.
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -74,14 +76,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             });
     }
 
-    /*
     protected void requestLocation() {
         LocationRequest lr = LocationRequest.create();
         lr.setInterval(10000);
         lr.setFastestInterval(10000);
         lr.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
-    */
 
 
     /**
