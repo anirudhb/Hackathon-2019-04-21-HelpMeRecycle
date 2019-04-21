@@ -124,7 +124,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         try {
             Geocoder coder = new Geocoder(this);
+            System.out.println("Creataed geocoder");
             List<String> addresses = DataIntercepter.run(item, getZipCodeFromLocation(targetLocation));
+            System.out.println("Ran intercepter");
             List<Address> latlong;
             for (String address: addresses) {
                 // Reverse geocode, and put on map.
@@ -135,6 +137,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.addMarker(new MarkerOptions()
                         .position(latlon)
                         .title("Another area"));
+                System.out.println("Plotted point");
             }
         } catch (IOException e) {
             System.out.printf("Error!%s\n", e.getMessage());
