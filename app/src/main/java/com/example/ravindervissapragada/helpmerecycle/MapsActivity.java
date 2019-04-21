@@ -121,8 +121,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Location targetLocation = new Location("");//provider name is unnecessary
         targetLocation.setLatitude(lat);//your coords of course
         targetLocation.setLongitude(lon);
-        DataIntercepter.run(item, getZipCodeFromLocation(targetLocation),getBaseContext());
-
+        try {
+            DataIntercepter.run(item, getZipCodeFromLocation(targetLocation),getBaseContext());
+        } catch (IOException e) {
+            System.out.println("Error!", e);
+        }
     }
     private String getZipCodeFromLocation(Location location) {
         Address addr = getAddressFromLocation(location);
