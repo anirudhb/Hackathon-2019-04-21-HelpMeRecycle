@@ -17,7 +17,7 @@ public class DataIntercepter{
 
     }
     */
-    public static void run(String what, String zipcode, Context context) throws {
+    public static void run(String what, String zipcode, Context context) throws IOException {
         Geocoder geocoder = new Geocoder(context);
 
 
