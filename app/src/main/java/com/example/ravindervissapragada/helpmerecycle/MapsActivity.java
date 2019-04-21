@@ -23,6 +23,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
+    private int locationRequestCode = 1000;
+    private double lat, lon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +34,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        // Ask for location.
-        //requestLocation();
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        // Ask for permission if not already granted.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, locationRequestCode);
+        } else {
+            getCurrentLocation();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case locationRequestCode:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getCurrentLocation();
+                }
+                break;
+        }
+    }
+
+    protected void getCurrentLocation() {
+        fusedLocationClient().getLocation()
+            .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    lat = location.getLatitude();
+                    lon = location.getLongitude();
+                }
+            });
     }
 
     /*
@@ -60,23 +88,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        Task getLocation = fusedLocationClient.getLastLocation();
-        while (!getLocation.isComplete()) {
-            System.out.println("Getting location still...");
-        }
-        if (getLocation.isSuccessful()) {
-            System.out.println("Got location!");
-            Location location = (Location) getLocation.getResult();
-            if (location != null) {
-                System.out.println("Not null location!");
-                // Create LatLon Object and put it on the map.
-                double lat = location.getLatitude();
-                double lon = location.getLongitude();
-                LatLng latlon = new LatLng(lat, lon);
-                mMap.addMarker(new MarkerOptions()
-                        .position(latlon)
-                        .title("You Are Here"));
-            }
-        }
+        // Put the location on the map.
+        // Create LatLon Object and put it on the map.
+        LatLng latlon = new LatLng(lat, lon);
+        mMap.addMarker(new MarkerOptions()
+                .position(latlon)
+                .title("You Are Here"));
     }
 }
