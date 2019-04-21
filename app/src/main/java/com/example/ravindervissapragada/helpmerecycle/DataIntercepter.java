@@ -36,9 +36,16 @@ public class DataIntercepter{
             List<String> addresstxts = new ArrayList<String>();
             for (Element contact: contacts) {
                 addresstxts.add(contact.ownText());
+                System.out.println(contact.ownText());
             }
             String address = String.join(" ", addresstxts);
             addresses.add(address);
+        }
+        for(int i = 0; i<addresses.size(); i++) {
+            if((addresses.get(i).isEmpty()))
+            {
+                addresses.remove(i);
+            }
         }
         return addresses;
     }
