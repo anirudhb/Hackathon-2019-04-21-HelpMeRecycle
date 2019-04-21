@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity, ResultReceiver implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
@@ -112,6 +112,8 @@ public class MapsActivity extends FragmentActivity, ResultReceiver implements On
         }
     }
 
+    private LatLngReceiver receiver;
+
     protected void putMarker() {
         if (!mapReady || !hasLatLon) return;
         // Create LatLon Object and put it on the map.
@@ -122,25 +124,27 @@ public class MapsActivity extends FragmentActivity, ResultReceiver implements On
 
         System.out.println("Running intent service");
         // Get type from our intent and pass it on
+        receiver = new LatLngReceiver(new Handler());
         String type = getIntent().getStringExtra("type");
         Intent intent = new Intent(this, AddMarkersService.class);
         intent.putExtra("type", type);
         intent.putExtra("lat", lat);
         intent.putExtra("lon", lon);
-        intent.putExtra("receiver", (ResultReceiver) this);
+        intent.putExtra("receiver", receiver);
         startService(intent);
     }
-
-    @Override
-    public void send(int resultCode, Bundle data) {
-        if (resultCode == 0) {
-            // Receive latitudes and longitudes, and put them on the map.
-            ArrayList<LatLng> places = data.getParcelableArrayList(AddMarkersService.RES_KEY);
-            for (LatLng place: places) {
-                mMap.addMarker(new MarkerOptions()
-                        .position(place)
-                        .title("A place"));
-                System.out.println("Added marker");
+    private class LatLngReceiver extends ResultReceiver {
+        @Override
+        public void send(int resultCode, Bundle data) {
+            if (resultCode == 0) {
+                // Receive latitudes and longitudes, and put them on the map.
+                ArrayList<LatLng> places = data.getParcelableArrayList(AddMarkersService.RES_KEY);
+                for (LatLng place: places) {
+                    mMap.addMarker(new MarkerOptions()
+                            .position(place)
+                            .title("A place"));
+                    System.out.println("Added marker");
+                }
             }
         }
     }
