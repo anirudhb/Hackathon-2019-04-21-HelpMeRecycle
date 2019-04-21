@@ -25,6 +25,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FusedLocationProviderClient fusedLocationClient;
     private int locationRequestCode = 1000;
     private double lat, lon;
+    private boolean hasLatLon = false;
+    private boolean mapReady = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (location != null) {
                         lat = location.getLatitude();
                         lon = location.getLongitude();
+                        hasLatLon = true;
+                        putMarker();
                     } else {
                         getCurrentLocation();
                     }
@@ -92,7 +96,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        // Put the location on the map.
+        mapReady = true;
+        putMarker();
+    }
+
+    protected void putMarker() {
+        if (!mapReady || !hasLatLon) return;
         // Create LatLon Object and put it on the map.
         LatLng latlon = new LatLng(lat, lon);
         mMap.addMarker(new MarkerOptions()
