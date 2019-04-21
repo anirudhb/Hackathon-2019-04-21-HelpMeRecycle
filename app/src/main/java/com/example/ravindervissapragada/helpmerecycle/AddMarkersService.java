@@ -1,9 +1,23 @@
 package com.example.ravindervissapragada.helpmerecycle;
 
+import android.app.IntentService;
+import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.List;
+import java.util.Locale;
+
 class AddMarkersService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
-        String item = getIntent().getStringExtra("type");
+        String item = intent.getStringExtra("type");
+        double lat = intent.getDoubleExtra("lat");
+        double lon = intent.getDoubleExtra("lon");
         Location targetLocation = new Location("");//provider name is unnecessary
         targetLocation.setLatitude(lat);//your coords of course
         targetLocation.setLongitude(lon);
