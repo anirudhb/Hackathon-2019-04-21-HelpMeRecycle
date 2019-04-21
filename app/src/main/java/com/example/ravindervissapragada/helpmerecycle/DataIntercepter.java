@@ -17,8 +17,7 @@ public class DataIntercepter{
 
     }
     */
-    public static void run(String what, String zipcode, Context context) throws IOException {
-        Geocoder geocoder = new Geocoder(context);
+    public static void run(String what, String zipcode) throws IOException {
 
 
         String url = String.format("http://search.earth911.com/?what=%s&where=%d", what, zipcode);
