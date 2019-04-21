@@ -38,12 +38,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
 
+    /*
     protected void requestLocation() {
         LocationRequest lr = LocationRequest.create();
         lr.setInterval(10000);
         lr.setFastestInterval(10000);
         lr.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
+    */
 
 
     /**
