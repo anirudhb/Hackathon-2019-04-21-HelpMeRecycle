@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Help Me Recycle</string>
     <string name="title_activity_maps">RecycleMap</string>
+    <!--
+    string name="key" templateMergeStrategy="preserve" translatable="false">AIzaSyCvEYX3gnWlrJKsPR2lHGEQlGOeEEZ7ncA</string>
+    -->
 </resources>
