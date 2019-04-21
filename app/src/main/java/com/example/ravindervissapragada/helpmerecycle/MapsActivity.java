@@ -21,16 +21,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
 
     private final LocationListener mLocationListener = new LocationListener() {
-        @Override
-        public void onProviderEnabled(String s) {}
-        @Override
-        public void onStatusChanged(String s, int i, Bundle b) {}
+        public final MapsActivity activity = this;
         @Override
         public void onLocationChanged(final Location location) {
             double lat = location.getLatitude();
-            double lon = location.getLongitude();/*
+            double lon = location.getLongitude();
             LatLng myLoc = new LatLng(lat, lon);
-            setMyLocation(myLoc);/*
+            setMyLocation(myLoc);
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -48,10 +45,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.addMarker(new MarkerOptions()
                     .title("You Are Here")
                     .snippet("")
-                    .position(myLoc));*/
+                    .position(myLoc));
         }
         @Override
-        public void onProviderDisabled(String s) {}
+        protected void onProviderDisable(String s) {}
     };
 
     @Override
