@@ -7,7 +7,6 @@ import android.os.Bundle;
 
 public class CameraActivity extends AppCompatActivity {
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,8 +21,17 @@ public class CameraActivity extends AppCompatActivity {
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
-        /*Intent map = new Intent(this,MapsActivity.class);
-        map.putExtra("type","plastic");
-        startActivity(map);*/
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            if (resultCode == RESULT_OK) {
+                Intent map = new Intent(this,MapsActivity.class);
+                map.putExtra("type","plastic");
+                startActivity(map);
+            }
+            this.finish();
+        }
     }
 }
