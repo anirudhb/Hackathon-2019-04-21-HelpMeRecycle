@@ -108,42 +108,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    protected class DataTask extends AsyncTask<Activity, Void, Void> {
-        @Override
-        protected Void doInBackground(Activity... v) {
-            Bundle extras = getIntent().getExtras();
-            String item = "";
-            if (extras != null) {
-                item = extras.getString("type");
-            }
-            Location targetLocation = new Location("");//provider name is unnecessary
-            targetLocation.setLatitude(lat);//your coords of course
-            targetLocation.setLongitude(lon);
-            Activity a = v[0];
-            try {
-                Geocoder coder = new Geocoder(a, Locale.ENGLISH);
-                System.out.println("Creataed geocoder");
-                List<String> addresses = DataIntercepter.run(item, getZipCodeFromLocation(coder, targetLocation));
-                System.out.println("Ran intercepter");
-                List<Address> latlong;
-                for (String address: addresses) {
-                    // Reverse geocode, and put on map.
-                    latlong = coder.getFromLocationName(address, 5);
-                    if (latlong == null) { continue; }
-                    Address l = latlong.get(0);
-                    LatLng pt = new LatLng(l.getLatitude(), l.getLongitude());
-                    mMap.addMarker(new MarkerOptions()
-                            .position(pt)
-                            .title("Another area"));
-                    System.out.println("Plotted point");
-                }
-            } catch (IOException e) {
-                System.out.printf("Error: %s\n", e.getLocalizedMessage());
-            }
-            return null;
-        }
-    }
-
     protected void putMarker() {
         if (!mapReady || !hasLatLon) return;
         // Create LatLon Object and put it on the map.
@@ -152,8 +116,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .position(latlon)
                 .title("You Are Here"));
 
-        System.out.println("Running data task");
-        new DataTask().execute(this);
+        System.out.println("Running intent service");
+        // Get type from our intent and pass it on
+        String type = getIntent().getStringExtra("type");
+        Intent intent = new Intent(this, AddMarkersService.class);
+        intent.putExtra("type", type);
+        startService(intent);
     }
     private String getZipCodeFromLocation(Geocoder geocoder, Location location) {
         Address addr = getAddressFromLocation(geocoder, location);
