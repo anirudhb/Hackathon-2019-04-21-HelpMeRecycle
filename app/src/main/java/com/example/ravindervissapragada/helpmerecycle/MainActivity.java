@@ -3,6 +3,7 @@ package com.example.ravindervissapragada.helpmerecycle;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -20,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         Button next = (Button) findViewById(R.id.enter);
 
     }
-    protected void change(){
+    public void change(View next){
         String value = garbage.getSelectedItem().toString();
         if(value != "other")
         {
