@@ -12,6 +12,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -23,7 +25,7 @@ import com.google.android.gms.tasks.Task;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private LocationManager lm;
+    private FusedLocationProviderClient fusedLocationClient;
     private int locationRequestCode = 1000;
     private double lat, lon;
     private boolean hasLatLon = false;
@@ -37,13 +39,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        //fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         // Ask for permission if not already granted.
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, locationRequestCode);
         } else {
             addLocationListener();
+            enableMyLocation();
         }
     }
 
@@ -54,6 +56,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case 1000:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     addLocationListener();
+                    enableMyLocation();
                 }
                 break;
         }
@@ -68,6 +71,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     lon = l.getLongitude();
                     hasLatLon = true;
                     putMarker();
+                    // Single position.
+                    lm.removeUpdates(this);
                 }
             }
 
@@ -95,7 +100,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mapReady = true;
+        enableMyLocation();
         putMarker();
+    }
+
+    protected void enableMyLocation() {
+        if (mapReady) {
+            googleMap.setMyLocationEnabled(true);
+        }
     }
 
     protected void putMarker() {

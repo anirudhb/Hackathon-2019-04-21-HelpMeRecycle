@@ -9,12 +9,14 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.IOException;
 public class DataIntercepter extends MapsActivity{
+    /* not necessary, we will be instantiating this from the activity
     public static void main(String[] args) throws IOException {
         DataIntercepter di = new DataIntercepter();
         di.run();
 
     }
-    public void run(){
+    */
+    public void run(String what, int zipcode) {
         Geocoder geocoder = new Geocoder();
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -22,7 +24,8 @@ public class DataIntercepter extends MapsActivity{
             String zipcode = geocoder.getFromLocation(lat,lon, 1);
         }
 
-        Document doc = Jsoup.connect("http://search.earth911.com/?what="+).get();
+        String url = String.format("http://search.earth911.com/?what=%s&where=%d", what, zipcode);
+        Document doc = Jsoup.connect(url).get();
         log(doc.title());
 
         Elements newsHeadlines = doc.select("#mp-itn b a");
