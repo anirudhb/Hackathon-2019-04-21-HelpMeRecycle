@@ -1,15 +1,17 @@
 package com.example.ravindervissapragada.helpmerecycle;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
-import com.google.android.gms.location.LocationManager;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -36,7 +38,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         // Ask for permission if not already granted.
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, locationRequestCode);
@@ -49,7 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case locationRequestCode:
+            case 1000:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     addLocationListener();
                 }
@@ -58,7 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     protected void addLocationListener() {
-        Criteria c;
+        Criteria c = new Criteria();
         c.setAccuracy(Criteria.ACCURACY_HIGH);
         c.setPowerRequirement(Criteria.NO_REQUIREMENT);
         lm.requestLocationUpdates(0, 1, c, new LocationListener() {
