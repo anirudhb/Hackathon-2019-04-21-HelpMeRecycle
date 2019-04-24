@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.ResultReceiver;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -62,6 +63,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             .title("A place"));
                     System.out.println("Added marker");
                 }
+                Snackbar mine = Snackbar.make(findViewById(R.id.map), "Loaded!", 5000);
+                mine.show();
             }
         }
     }
@@ -88,6 +91,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         IntentFilter ifil = new IntentFilter();
         ifil.addAction("SUCCESS");
         registerReceiver(receiver, ifil);
+        Snackbar mine = Snackbar.make(findViewById(R.id.map), "Loading nearby recycling centers...", 5000);
+        mine.show();
     }
 
     @Override
