@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.ResultReceiver;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -60,7 +61,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private class AMSReceiver extends BroadcastReceiver {
         public void onReceive(Context c, Intent intent) {
             System.out.println("recieve");
-            if (intent.getAction() == "SUCCESS") {
+            if (intent.getAction().equals("SUCCESS")) {
                 System.out.println("Received data");
                 // Receive latitudes and longitudes, and put them on the map.
                 ArrayList<LatLng> places = intent.getParcelableArrayListExtra(AddMarkersService.RES_KEY);
@@ -102,21 +103,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         IntentFilter ifil = new IntentFilter();
         ifil.addAction("SUCCESS");
         registerReceiver(receiver, ifil);
-<<<<<<< HEAD
         Snackbar mine = Snackbar.make(findViewById(R.id.map), "Loading...", 10000);
         mine.show();
-        ProgressBar pb = new ProgressBar(this, null, android.R.attr.progressBarStyleSmall);
-        lay = new FrameLayout(this);
-        lay.addView(pb);
-        mapFragment.getLayoutInflater().inflate(mapFragment.getId(), lay, false);
-=======
-        Snackbar mine = Snackbar.make(findViewById(R.id.map), "Loading nearby recycling centers...", 5000);
-        mine.show();
->>>>>>> theirs/master
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case 1000:
@@ -130,16 +123,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     protected void addLocationListener() {
         fusedLocationClient.getLastLocation()
-            .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location l) {
-                    if (l != null) {
-                        lat = l.getLatitude();
-                        lon = l.getLongitude();
-                        hasLatLon = true;
-                        putMarker();
-                    }
-                }});
+            .addOnSuccessListener(this, l -> {
+                if (l != null) {
+                    lat = l.getLatitude();
+                    lon = l.getLongitude();
+                    hasLatLon = true;
+                    putMarker();
+                }
+            });
     }
 
     /**
