@@ -73,7 +73,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             .title(title));
                     System.out.println("Added marker");
                 }
-                lay.removeViewAt(0);
+
+                Snackbar mine = Snackbar.make(findViewById(R.id.map), "Loaded!", 5000);
+                mine.show();
             }
         }
     }
@@ -100,12 +102,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         IntentFilter ifil = new IntentFilter();
         ifil.addAction("SUCCESS");
         registerReceiver(receiver, ifil);
+<<<<<<< HEAD
         Snackbar mine = Snackbar.make(findViewById(R.id.map), "Loading...", 10000);
         mine.show();
         ProgressBar pb = new ProgressBar(this, null, android.R.attr.progressBarStyleSmall);
         lay = new FrameLayout(this);
         lay.addView(pb);
         mapFragment.getLayoutInflater().inflate(mapFragment.getId(), lay, false);
+=======
+        Snackbar mine = Snackbar.make(findViewById(R.id.map), "Loading nearby recycling centers...", 5000);
+        mine.show();
+>>>>>>> theirs/master
     }
 
     @Override
