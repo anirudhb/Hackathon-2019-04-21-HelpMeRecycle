@@ -8,6 +8,8 @@ import java.util.Locale;
 import android.content.Context;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Pair;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,31 +24,26 @@ public class DataIntercepter{
     }
     */
     // Returns the addresses nearby.
-    public static List<String> run(String what, String zipcode) throws IOException {
+    public static List<Pair<String, String>> run(String what, String zipcode) throws IOException {
         String url = String.format(Locale.ENGLISH, "https://search.earth911.com/?what=%s&where=%s", what, zipcode);
         System.out.printf("URL: %s\n", url);
         Document doc = Jsoup.connect(url).get();
         System.out.println(doc.title());
 
-        List<String> addresses = new ArrayList<String>();
+        List<Pair<String, String>> addresses = new ArrayList<>();
         Elements locations = doc.select(".location");
         for (Element location: locations) {
             Elements contacts = location.select(".address1, .address2, .address3");
             // Contatenate their contents.
-            List<String> addresstxts = new ArrayList<String>();
+            List<String> addresstxts = new ArrayList<>();
             for (Element contact: contacts) {
                 addresstxts.add(contact.ownText());
                 System.out.printf("Contact: %s\n", contact.ownText());
             }
-            String address = String.join(" ", addresstxts);
-            addresses.add(address);
-        }
-        for(int i = 0; i<addresses.size(); i++) {
-            if((addresses.get(i).isEmpty()))
-            {
-                addresses.remove(i);
-                //startActivity(map);
-            }
+            String address = TextUtils.join(" ", addresstxts);
+            if (address.trim().isEmpty()) continue;
+            String title = location.selectFirst(".title > a").ownText();
+            addresses.add(Pair.create(address, title));
         }
         return addresses;
     }

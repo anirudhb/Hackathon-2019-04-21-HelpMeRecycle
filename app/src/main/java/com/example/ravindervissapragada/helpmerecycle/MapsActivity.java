@@ -18,9 +18,16 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.ResultReceiver;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
+import android.support.v4.widget.ContentLoadingProgressBar;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -44,6 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
+    private FrameLayout lay;
     private int locationRequestCode = 1000;
     private double lat, lon;
     private boolean hasLatLon = false;
@@ -56,12 +64,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 System.out.println("Received data");
                 // Receive latitudes and longitudes, and put them on the map.
                 ArrayList<LatLng> places = intent.getParcelableArrayListExtra(AddMarkersService.RES_KEY);
-                for (LatLng place: places) {
+                ArrayList<String> titles = intent.getStringArrayListExtra(AddMarkersService.RES2_KEY);
+                for (int i = 0; i < places.size(); i++) {
+                    LatLng place = places.get(i);
+                    String title = titles.get(i);
                     mMap.addMarker(new MarkerOptions()
                             .position(place)
-                            .title("A place"));
+                            .title(title));
                     System.out.println("Added marker");
                 }
+                lay.removeViewAt(0);
             }
         }
     }
@@ -88,6 +100,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         IntentFilter ifil = new IntentFilter();
         ifil.addAction("SUCCESS");
         registerReceiver(receiver, ifil);
+        Snackbar mine = Snackbar.make(findViewById(R.id.map), "Loading...", 10000);
+        mine.show();
+        ProgressBar pb = new ProgressBar(this, null, android.R.attr.progressBarStyleSmall);
+        lay = new FrameLayout(this);
+        lay.addView(pb);
+        mapFragment.getLayoutInflater().inflate(mapFragment.getId(), lay, false);
     }
 
     @Override
@@ -130,12 +148,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mapReady = true;
-        enableMyLocation();
+        android.widget.ProgressBar pb = new android.widget.ProgressBar(this, null, android.R.attr.progressBarStyleSmall);
         putMarker();
+        enableMyLocation();
     }
 
     protected void enableMyLocation() {
-        if (mapReady) {
+        if (mapReady && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         }
     }
@@ -145,9 +164,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (!mapReady || !hasLatLon) return;
         // Create LatLon Object and put it on the map.
         LatLng latlon = new LatLng(lat, lon);
-        mMap.addMarker(new MarkerOptions()
-                .position(latlon)
-                .title("You Are Here"));
+        //mMap.addMarker(new MarkerOptions()
+        //        .position(latlon)
+        //        .title("You Are Here"));
         CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(latlon, 10);
         mMap.animateCamera(cu);
 
@@ -159,22 +178,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         intent.putExtra("lat", lat);
         intent.putExtra("lon", lon);
         startService(intent);
-    }
-
-    private String getZipCodeFromLocation(Geocoder geocoder, Location location) {
-        Address addr = getAddressFromLocation(geocoder, location);
-        return addr.getPostalCode() == null ? "" : addr.getPostalCode();
-    }
-    private Address getAddressFromLocation(Geocoder geocoder, Location location) {
-        Address address = new Address(Locale.getDefault());
-        try {
-            List<Address> addr = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-            if (addr.size() > 0) {
-                address = addr.get(0);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return address;
     }
 }

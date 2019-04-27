@@ -7,6 +7,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.ResultReceiver;
+import android.util.Pair;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -19,8 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-class AddMarkersService extends IntentService {
+public class AddMarkersService extends IntentService {
     final static String RES_KEY = "res";
+    final static String RES2_KEY = "res2";
 
     public AddMarkersService(String s) {
         super(s);
@@ -44,10 +46,13 @@ class AddMarkersService extends IntentService {
         try {
             Geocoder coder = new Geocoder(this, Locale.getDefault());
             System.out.println("Creataed geocoder");
-            List<String> addresses = DataIntercepter.run(item, getZipCodeFromLocation(coder, targetLocation));
+            List<Pair<String, String>> addresses = DataIntercepter.run(item, getZipCodeFromLocation(coder, targetLocation));
             System.out.println("Ran intercepter");
-            ArrayList<LatLng> pts = new ArrayList<LatLng>();
-            for (String address: addresses) {
+            ArrayList<LatLng> pts = new ArrayList<>();
+            ArrayList<String> titles = new ArrayList<>();
+            for (Pair<String, String> p: addresses) {
+                String address = p.first;
+                String title = p.second;
                 // Reverse geocode, and put on map.
                 System.out.printf("Address: %s\n", address);
                 if (address.isEmpty()) continue;
@@ -61,18 +66,20 @@ class AddMarkersService extends IntentService {
                 Address a = loc.get(0);
                 LatLng pt = new LatLng(a.getLatitude(), a.getLongitude());
                 pts.add(pt);
+                titles.add(title);
             }
             System.out.println("Success");
-            deliverResultToReceiver(0, pts);
+            deliverResultToReceiver(0, pts, titles);
         } catch (Exception e) {
             System.out.printf("Error: %s\n", e.getLocalizedMessage());
         }
     }
 
-    private void deliverResultToReceiver(int resultCode, ArrayList<LatLng> message) {
+    private void deliverResultToReceiver(int resultCode, ArrayList<LatLng> message, ArrayList<String> titles) {
         Intent intent = new Intent();
         intent.setAction("SUCCESS");
         intent.putExtra(RES_KEY, message);
+        intent.putExtra(RES2_KEY, titles);
         System.out.println("sending broadcast");
         sendBroadcast(intent);
     }
