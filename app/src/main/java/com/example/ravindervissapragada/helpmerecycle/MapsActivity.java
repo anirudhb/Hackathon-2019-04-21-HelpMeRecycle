@@ -1,6 +1,7 @@
 package com.example.ravindervissapragada.helpmerecycle;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -121,6 +122,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    // Suppressed because we ensure we have permission
+    // before calling this function.
+    @SuppressLint("MissingPermission")
     protected void addLocationListener() {
         fusedLocationClient.getLastLocation()
             .addOnSuccessListener(this, l -> {
