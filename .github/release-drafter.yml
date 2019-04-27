@@ -6,3 +6,11 @@ template: |
   ## Changes
   
   $CHANGES
+
+  For now, the APKs are unsigned, until we figure out signing.
+  Later, the app will be directly released to Google Play.
+
+  **Please do not use, unless you want an extremely buggy and prone-to-crash app!**
+
+  When release builds are available, it signifies that the app is of production-ready quality
+  (of course, if it is not a pre-release).
