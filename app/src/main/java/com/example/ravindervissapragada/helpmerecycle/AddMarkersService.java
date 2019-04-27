@@ -38,16 +38,16 @@ public class AddMarkersService extends IntentService {
         double lat = intent.getDoubleExtra("lat", 0);
         double lon = intent.getDoubleExtra("lon", 0);
         GeoApiContext ctxt = new GeoApiContext.Builder()
-                .apiKey(getString(R.string.key))
+                .apiKey(getString(R.string.google_maps_key))
                 .build();
         Location targetLocation = new Location("");//provider name is unnecessary
         targetLocation.setLatitude(lat);//your coords of course
         targetLocation.setLongitude(lon);
         try {
             Geocoder coder = new Geocoder(this, Locale.getDefault());
-            System.out.println("Creataed geocoder");
+            System.out.println("Created geocoder");
             List<Pair<String, String>> addresses = DataIntercepter.run(item, getZipCodeFromLocation(coder, targetLocation));
-            System.out.println("Ran intercepter");
+            System.out.println("Ran interceptor");
             ArrayList<LatLng> pts = new ArrayList<>();
             ArrayList<String> titles = new ArrayList<>();
             for (Pair<String, String> p: addresses) {
